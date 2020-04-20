@@ -164,7 +164,8 @@ def OwnerBooks():
                 
             except:
                 book = {'id_book': 'not found'}
-        
+        #add conditional if book not in Books table, add the new book
+
             books_owner.append(book)
 
 
@@ -192,7 +193,7 @@ def sharebook_results():
     return data
 
 @app.route("/getuserinputs/<isbn>", methods=["GET", "POST"])
-def OwnerDetails(isbn):
+def ShareForm(isbn):
     title=""
     book=""
     items= db.session.query(Book.title, Book.image_url,Book.authors, Book.average_rating, Book.reviews_count).filter(Book.isbn==isbn).all()
@@ -213,8 +214,49 @@ def OwnerDetails(isbn):
        
     return render_template("Share_Form.html",data=book)
 
+@app.route("/getownerdetails/<isbn>", methods=["GET", "POST"])
+def OwnerDetails(isbn):
+    title=""
+    #query database to get the book details
+    book= db.session.query(Book.title, Book.image_url,Book.authors, Book.average_rating, Book.reviews_count).filter(Book.isbn==isbn).all()
+    
+    #query database to get all the owners for the above book
+    owners=db.session.query(Owner.owner_name, Owner.owner_email, Owner.contact_details, Owner.location,Owner.lat, Owner.lon).\
+            filter(Owner.isbn==isbn).all()
+    
+    listOwners = []
+    for owner in owners:
+        dict_owner = {
+            "name":owner.owner_name,
+            "email" : owner.owner_email,
+            "contact_details" : owner.contact_details,
+            "location": owner.location,
+            "lat" : owner.lat,
+            "lon" : owner.lon  
+        }
+        listOwners.append(dict_owner)
+    
+    for item in book:
+        title=item.title
+        author=item.authors
+        rating=item.average_rating
+        reviews=item.reviews_count
+        image=item.image_url
 
-# Query the database and send the jsonified results
+    global books
+    books={"title":title,
+            "isbn":isbn,
+            "image":image,
+            "author":author,
+            "rating":rating,
+            "reviews":reviews,
+            "owners":listOwners,
+            "similar_books":similar_books}
+        
+    return render_template("Owner_Details.html",data=books)
+
+
+# Query the database to store owner details
 @app.route("/send", methods=["GET", "POST"])
 def send():
 
@@ -274,6 +316,8 @@ def Library():
 def visualisations():
     
     return render_template("Stats.html")
+
+# route to add recommendation model 
 
 
 if __name__ == "__main__":
