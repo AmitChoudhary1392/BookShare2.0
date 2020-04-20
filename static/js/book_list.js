@@ -42,8 +42,8 @@ d3.json(url_list, function(response){
                                     <div class="col-lg-2">
                                         <div class="books-links">
                                             <a href=""><img src="../static/img/icons/p-1.png" alt=""></a>
-                                            <a id="share"><img src="../static/img/icons/p-2.png" alt=""></a>
-                                            <a href="/bookSearch"><img src="../static/img/icons/p-3.png" alt=""></a>
+                                            <a id="share"><img src="../static/img/icons/p-2.png" alt="share Book"></a>
+                                            <a id="find"><img src="../static/img/icons/p-3.png" alt="Get Book"></a>
                                         </div>
                                     </div>
                                 </div>
@@ -58,11 +58,13 @@ d3.json(url_list, function(response){
        title = d3.select(this).select("#title").text()
        isbn=d3.select(this).select("#isbn").text()
        d3.select(this).select("#share").attr("href",`/getuserinputs/${isbn}`)
+       d3.select(this).select("#find").attr("href",`/getownerdetails/${isbn}`)
        console.log(title)
        console.log(isbn)
 
        });
        
+    //add code for displaying owner results 
     
 });
 
